@@ -1,0 +1,34 @@
+@baseUrl = http://localhost:5275
+@movieId = 1
+
+### App metadata
+GET {{baseUrl}}/
+
+### Version
+GET {{baseUrl}}/version
+
+### Health check
+GET {{baseUrl}}/health
+
+### List movies
+GET {{baseUrl}}/api/movies
+
+### Get a movie by id
+GET {{baseUrl}}/api/movies/{{movieId}}
+
+### Create a movie
+POST {{baseUrl}}/api/movies
+Content-Type: application/json
+
+{
+  "title": "The Matrix",
+  "releaseYear": 1999,
+  "genre": "Science Fiction",
+  "director": "Lana Wachowski and Lilly Wachowski"
+}
+
+### OpenAPI document
+GET {{baseUrl}}/openapi/v1.json
+
+### Scalar API docs
+GET {{baseUrl}}/docs
