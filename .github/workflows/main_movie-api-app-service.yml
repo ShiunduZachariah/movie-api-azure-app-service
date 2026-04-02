@@ -17,6 +17,7 @@ jobs:
       PROJECT_PATH: movie-api-app-service/movie-api-app-service.csproj
       TEST_PROJECT_PATH: tests/movie-api-app-service.Tests/movie-api-app-service.Tests.csproj
       PUBLISH_DIR: ${{ github.workspace }}/publish
+      PACKAGE_PATH: ${{ github.workspace }}/movie-api-app-service.zip
     
     steps:
     - uses: actions/checkout@v4
@@ -38,9 +39,14 @@ jobs:
     - name: dotnet publish
       run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -o ${{ env.PUBLISH_DIR }} --no-build
 
+    - name: Create deployment package
+      run: |
+        cd "${{ env.PUBLISH_DIR }}"
+        zip -r "${{ env.PACKAGE_PATH }}" .
+
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v3
       with: 
         app-name: 'movie-api-app-service'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_ebaec6df2d27424f89495ad093c34358 }}
-        package: ${{ env.PUBLISH_DIR }}
+        package: ${{ env.PACKAGE_PATH }}
