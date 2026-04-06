@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: 'Build and deploy ASP.NET Core app to Azure Web App: movie-api-app-service'
+name: 'Build and deploy ASP.NET Core app to Azure Web App: movietest'
 
 on:
   push:
@@ -13,11 +13,10 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     env:
-      SOLUTION_PATH: movie-api-app-service.sln
+      WEBAPP_NAME: movietest
       PROJECT_PATH: movie-api-app-service/movie-api-app-service.csproj
       TEST_PROJECT_PATH: tests/movie-api-app-service.Tests/movie-api-app-service.Tests.csproj
       PUBLISH_DIR: ${{ github.workspace }}/publish
-      PACKAGE_PATH: ${{ github.workspace }}/movie-api-app-service.zip
     
     steps:
     - uses: actions/checkout@v4
@@ -28,10 +27,10 @@ jobs:
         dotnet-version: '10.0.x'
 
     - name: Restore
-      run: dotnet restore ${{ env.SOLUTION_PATH }}
+      run: dotnet restore ${{ env.PROJECT_PATH }}
 
     - name: Build with dotnet
-      run: dotnet build ${{ env.SOLUTION_PATH }} --configuration Release --no-restore
+      run: dotnet build ${{ env.PROJECT_PATH }} --configuration Release --no-restore
 
     - name: Test with dotnet
       run: dotnet test ${{ env.TEST_PROJECT_PATH }} --configuration Release --no-build --verbosity normal
@@ -39,14 +38,14 @@ jobs:
     - name: dotnet publish
       run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -o ${{ env.PUBLISH_DIR }} --no-build
 
-    - name: Create deployment package
+    - name: Verify publish output
       run: |
-        cd "${{ env.PUBLISH_DIR }}"
-        zip -r "${{ env.PACKAGE_PATH }}" .
+        test -f "${{ env.PUBLISH_DIR }}/movie-api-app-service.dll"
+        ls -la "${{ env.PUBLISH_DIR }}"
 
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v3
       with: 
-        app-name: 'movie-api-app-service'
+        app-name: ${{ env.WEBAPP_NAME }}
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_ebaec6df2d27424f89495ad093c34358 }}
-        package: ${{ env.PACKAGE_PATH }}
+        package: ${{ env.PUBLISH_DIR }}
