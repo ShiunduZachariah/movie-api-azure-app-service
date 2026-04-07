@@ -12,6 +12,9 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     env:
       SOLUTION_PATH: movie-api-app-service.sln
       WEBAPP_NAME: movietest
@@ -44,9 +47,15 @@ jobs:
         test -f "${{ env.PUBLISH_DIR }}/movie-api-app-service.dll"
         ls -la "${{ env.PUBLISH_DIR }}"
 
+    - name: Login to Azure
+      uses: azure/login@v2
+      with:
+        client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_3FFA5D1549BF4B409573513D31DD902F }}
+        tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_7C76093AB437468690E0A1A060D5E32B }}
+        subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_76DF915120B24E3397662FE44568F749 }}
+
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v3
       with: 
         app-name: ${{ env.WEBAPP_NAME }}
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_ebaec6df2d27424f89495ad093c34358 }}
         package: ${{ env.PUBLISH_DIR }}
