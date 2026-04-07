@@ -17,6 +17,7 @@ jobs:
       contents: read
     env:
       SOLUTION_PATH: movie-api-app-service.sln
+      RESOURCE_GROUP: testmovieapp
       WEBAPP_NAME: movietest
       PROJECT_PATH: movie-api-app-service/movie-api-app-service.csproj
       TEST_PROJECT_PATH: tests/movie-api-app-service.Tests/movie-api-app-service.Tests.csproj
@@ -53,6 +54,9 @@ jobs:
         client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_3FFA5D1549BF4B409573513D31DD902F }}
         tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_7C76093AB437468690E0A1A060D5E32B }}
         subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_76DF915120B24E3397662FE44568F749 }}
+
+    - name: Ensure Linux startup command
+      run: az webapp config set --name ${{ env.WEBAPP_NAME }} --resource-group ${{ env.RESOURCE_GROUP }} --startup-file "dotnet movie-api-app-service.dll"
 
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v3
